@@ -35,3 +35,29 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Claude Code / OMC ###
+.claude/
+.omc/
+
+### 환경변수 / 시크릿 ###
+.env
+.env.*
+application-local.properties
+application-secret.properties
+application-prod.properties
+
+### 인증서 / 키 ###
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+
+### 로그 ###
+logs/
+*.log
+
+### OS ###
+.DS_Store
+Thumbs.db
