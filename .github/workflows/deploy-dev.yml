@@ -36,34 +36,29 @@ jobs:
 
       - name: Start application
         uses: appleboy/ssh-action@v1
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: DB_URL, DB_USERNAME, DB_PASSWORD
           script: |
             cd /home/ec2-user
             
             CURRENT_PID=$(pgrep -f "triply-0.0.1-SNAPSHOT.jar")
-            if [ -z "$CURRENT_PID" ]; then
-                echo "No running application found."
-            else
-                echo "Stopping application (PID: $CURRENT_PID)..."
+            if [ ! -z "$CURRENT_PID" ]; then
                 kill -15 $CURRENT_PID
                 sleep 5
             fi
 
-            if [ -f .env ]; then
-                export $(grep -v '^#' .env | xargs)
-            fi
-
-            echo "Starting application..."
+            echo "DB_URL=$DB_URL" > .env
+            echo "DB_USERNAME=$DB_USERNAME" >> .env
+            echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+            
             nohup java -jar triply-0.0.1-SNAPSHOT.jar > app.log 2>&1 < /dev/null &
             
             sleep 3
-            if ps -ef | grep -v grep | grep "triply-0.0.1-SNAPSHOT.jar" > /dev/null
-            then
-                echo "Application started successfully."
-            else
-                echo "Application failed to start. Check app.log"
-                exit 1
-            fi
+            ps -ef | grep triply-0.0.1-SNAPSHOT.jar | grep -v grep
