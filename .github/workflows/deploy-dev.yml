@@ -43,3 +43,4 @@ jobs:
             
             sleep 10
             sudo docker ps | grep triply-app
+
