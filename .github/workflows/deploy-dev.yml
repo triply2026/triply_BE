@@ -30,6 +30,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          debug: true
+          script_stop: true
           script: |
             pkill -f 'java -jar' || true
             sleep 2
