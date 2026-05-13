@@ -6,13 +6,12 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # 성능 좋은 깃허브 서버에서 빌드합니다.
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 1. 여기서 자바 빌드를 미리 합니다 (서버가 힘들어하지 않게!)
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
