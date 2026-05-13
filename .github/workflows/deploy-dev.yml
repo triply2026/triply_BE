@@ -46,7 +46,6 @@ jobs:
           envs: DB_URL, DB_USERNAME, DB_PASSWORD
           script: |
             cd /home/ec2-user/triply
-            # 파일 이름 정리
             mv *.jar app.jar || true
             
             printf "DB_URL=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\n" "$DB_URL" "$DB_USERNAME" "$DB_PASSWORD" > .env
