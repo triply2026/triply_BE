@@ -3,6 +3,8 @@ package com.example.triply.auth.controller;
 import com.example.triply.auth.domain.AuthRequestDto;
 import com.example.triply.auth.domain.AuthResponseDto;
 import com.example.triply.auth.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "인증")
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
@@ -21,6 +24,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
+    @Operation(summary = "회원가입")
     public ResponseEntity<AuthResponseDto.MemberInfo> signUp(
             @Valid @RequestBody AuthRequestDto.SignUp request) {
         AuthResponseDto.MemberInfo response = authService.signUp(request);
@@ -28,6 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "로그인")
     public ResponseEntity<AuthResponseDto.MemberInfo> login(
             @Valid @RequestBody AuthRequestDto.Login request,
             HttpSession session) {
@@ -37,6 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "로그아웃")
     public ResponseEntity<Void> logout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok().build();
