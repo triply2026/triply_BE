@@ -4,7 +4,9 @@ import com.example.triply.member.entity.Member;
 import com.example.triply.tripPlan.entity.Place;
 import com.example.triply.vote.entity.enums.VoteType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,8 +15,9 @@ import lombok.NoArgsConstructor;
         @UniqueConstraint(columnNames = {"user_id", "place_id"})
 })
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Vote {
 
     @Id
@@ -32,4 +35,8 @@ public class Vote {
     @Enumerated(EnumType.STRING)
     @Column(name = "vote_type", nullable = false)
     private VoteType voteType;
+
+    public void changeVoteType(VoteType voteType) {
+        this.voteType = voteType;
+    }
 }
