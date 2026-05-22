@@ -2,6 +2,7 @@ package com.example.triply.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -25,9 +26,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("GET", "/api/v1/places/*/votes/summary").permitAll()
-                        .requestMatchers("GET", "/api/v1/votes/summary").permitAll()
-                        .requestMatchers("GET", "/api/v1/days/*/votes/sorted-place-ids").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/places/*/votes/summary").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/votes/summary").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/days/*/votes/sorted-place-ids").permitAll()
                         .anyRequest().authenticated());
 
         return http.build();
