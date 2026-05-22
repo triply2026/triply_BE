@@ -42,6 +42,7 @@ public class GeminiApiClient {
         } catch (Exception e) {
             log.error("Gemini API call failed: {}", e.getMessage(), e);
             throw new GeminiApiException("Gemini API call failed: " + e.getMessage(), e);
+
         }
     }
 }
