@@ -1,5 +1,6 @@
 package com.example.triply.ai.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,5 +23,10 @@ public class GeminiConfig {
     @Bean(name = "geminiModelName")
     public String geminiModelName() {
         return modelName;
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }
