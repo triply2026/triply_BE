@@ -48,18 +48,19 @@ jobs:
           DB_URL: ${{ secrets.DB_URL }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: DB_URL, DB_USERNAME, DB_PASSWORD
+          envs: DB_URL, DB_USERNAME, DB_PASSWORD, GEMINI_API_KEY
           script: |
             cd /home/ec2-user/triply
-            
+
             rm -f app.jar
             cp triply-0.0.1-SNAPSHOT.jar app.jar
-            
-            printf "DB_URL=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\n" "$DB_URL" "$DB_USERNAME" "$DB_PASSWORD" > .env
+
+            printf "DB_URL=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\nGEMINI_API_KEY=%s\n" "$DB_URL" "$DB_USERNAME" "$DB_PASSWORD" "$GEMINI_API_KEY" > .env
             
             sudo docker-compose down
             sudo docker-compose up -d --build --force-recreate
