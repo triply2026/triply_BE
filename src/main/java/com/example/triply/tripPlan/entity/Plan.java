@@ -49,4 +49,8 @@ public class Plan {
 
     @Column(name = "shared_token", unique = true, length = 100)
     private String sharedToken;
+
+    public void assignSharedToken(String token) {
+        this.sharedToken = token;
+    }
 }

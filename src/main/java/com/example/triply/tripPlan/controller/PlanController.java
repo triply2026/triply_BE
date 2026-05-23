@@ -2,6 +2,7 @@ package com.example.triply.tripPlan.controller;
 
 import com.example.triply.tripPlan.entity.Plan;
 import com.example.triply.tripPlan.service.PlanQueryService;
+import com.example.triply.tripPlan.service.PlanShareService;
 import com.example.triply.websocket.service.ParticipantSessionService;
 import com.example.triply.websocket.service.PlaceEditLockService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class PlanController {
 
     private final PlanQueryService planQueryService;
+    private final PlanShareService planShareService;
     private final ParticipantSessionService participantSessionService;
     private final PlaceEditLockService placeEditLockService;
 
@@ -41,6 +43,16 @@ public class PlanController {
     @Operation(summary = "플랜 상세 조회 (초기 렌더링용)")
     public ResponseEntity<PlanQueryService.PlanStateDto> getPlanDetail(@PathVariable Long planId) {
         return ResponseEntity.ok(planQueryService.getPlanState(planId));
+    }
+
+    @PostMapping("/{planId}/share")
+    @Operation(summary = "공유 링크 생성")
+    public ResponseEntity<ShareLinkResponse> generateShareLink(@PathVariable Long planId) {
+        PlanShareService.ShareResult result = planShareService.generateShareLink(planId);
+        return ResponseEntity.ok(ShareLinkResponse.builder()
+                .shareToken(result.getShareToken())
+                .shareUrl(result.getShareUrl())
+                .build());
     }
 
     @GetMapping("/shared/{token}")
@@ -91,6 +103,13 @@ public class PlanController {
                 .participants(participants)
                 .editLocks(editLocks)
                 .build());
+    }
+
+    @Getter
+    @Builder
+    public static class ShareLinkResponse {
+        private String shareToken;
+        private String shareUrl;
     }
 
     @Getter
