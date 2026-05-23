@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ItineraryResponseDto {
 
+    private Long planId;
+
     private List<DayPlan> days;
 
     @Getter
