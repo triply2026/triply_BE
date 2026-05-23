@@ -3,6 +3,7 @@ package com.example.triply.ai.controller;
 import com.example.triply.ai.dto.ItineraryRequestDto;
 import com.example.triply.ai.dto.ItineraryResponseDto;
 import com.example.triply.ai.service.ItineraryGenerationService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,12 @@ public class ItineraryGenerationController {
 
     @PostMapping("/itinerary/generate")
     public ResponseEntity<ItineraryResponseDto> generateItinerary(
-            @RequestBody @Valid ItineraryRequestDto request) {
-        return ResponseEntity.ok(itineraryGenerationService.generateItinerary(request));
+            @RequestBody @Valid ItineraryRequestDto request,
+            HttpSession session) {
+        Long memberId = (Long) session.getAttribute("memberId");
+        if (memberId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+        return ResponseEntity.ok(itineraryGenerationService.generateItinerary(request, memberId));
     }
 }
