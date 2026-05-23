@@ -1,8 +1,11 @@
 package com.example.triply.tripPlan.service;
 
+import com.example.triply.member.entity.PlanMember;
+import com.example.triply.member.repository.PlanMemberRepository;
 import com.example.triply.tripPlan.entity.Days;
 import com.example.triply.tripPlan.entity.Place;
 import com.example.triply.tripPlan.entity.Plan;
+import com.example.triply.tripPlan.entity.enums.PlanStatus;
 import com.example.triply.tripPlan.repository.DaysRepository;
 import com.example.triply.tripPlan.repository.PlaceRepository;
 import com.example.triply.tripPlan.repository.PlanRepository;
@@ -23,6 +26,22 @@ public class PlanQueryService {
     private final PlanRepository planRepository;
     private final DaysRepository daysRepository;
     private final PlaceRepository placeRepository;
+    private final PlanMemberRepository planMemberRepository;
+
+    @Transactional(readOnly = true)
+    public List<PlanSummaryDto> getMyPlans(Long memberId) {
+        return planMemberRepository.findByMemberId(memberId).stream()
+                .map(PlanMember::getPlan)
+                .map(plan -> PlanSummaryDto.builder()
+                        .planId(plan.getId())
+                        .title(plan.getTitle())
+                        .destination(plan.getDestination())
+                        .startDate(plan.getStartDate())
+                        .endDate(plan.getEndDate())
+                        .status(plan.getStatus())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public Plan findBySharedToken(String token) {
@@ -74,6 +93,17 @@ public class PlanQueryService {
                 .destination(plan.getDestination())
                 .days(dayStates)
                 .build();
+    }
+
+    @Getter
+    @Builder
+    public static class PlanSummaryDto {
+        private Long planId;
+        private String title;
+        private String destination;
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private PlanStatus status;
     }
 
     @Getter
