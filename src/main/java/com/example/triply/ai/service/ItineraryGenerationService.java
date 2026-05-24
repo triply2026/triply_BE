@@ -26,4 +26,6 @@ public class ItineraryGenerationService {
         String rawResponse = geminiApiClient.generateContent(prompt);
         return responseParser.parseItinerary(rawResponse);
     }
+
+
 }
