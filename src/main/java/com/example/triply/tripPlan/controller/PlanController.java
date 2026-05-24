@@ -2,10 +2,12 @@ package com.example.triply.tripPlan.controller;
 
 import com.example.triply.tripPlan.entity.Plan;
 import com.example.triply.tripPlan.service.PlanQueryService;
+import com.example.triply.tripPlan.service.PlanShareService;
 import com.example.triply.websocket.service.ParticipantSessionService;
 import com.example.triply.websocket.service.PlaceEditLockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +25,35 @@ import java.util.stream.Collectors;
 public class PlanController {
 
     private final PlanQueryService planQueryService;
+    private final PlanShareService planShareService;
     private final ParticipantSessionService participantSessionService;
     private final PlaceEditLockService placeEditLockService;
+
+    @GetMapping
+    @Operation(summary = "내 플랜 목록 조회")
+    public ResponseEntity<List<PlanQueryService.PlanSummaryDto>> getMyPlans(HttpSession session) {
+        Long memberId = (Long) session.getAttribute("memberId");
+        if (memberId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+        return ResponseEntity.ok(planQueryService.getMyPlans(memberId));
+    }
+
+    @GetMapping("/{planId}")
+    @Operation(summary = "플랜 상세 조회 (초기 렌더링용)")
+    public ResponseEntity<PlanQueryService.PlanStateDto> getPlanDetail(@PathVariable Long planId) {
+        return ResponseEntity.ok(planQueryService.getPlanState(planId));
+    }
+
+    @PostMapping("/{planId}/share")
+    @Operation(summary = "공유 링크 생성")
+    public ResponseEntity<ShareLinkResponse> generateShareLink(@PathVariable Long planId) {
+        PlanShareService.ShareResult result = planShareService.generateShareLink(planId);
+        return ResponseEntity.ok(ShareLinkResponse.builder()
+                .shareToken(result.getShareToken())
+                .shareUrl(result.getShareUrl())
+                .build());
+    }
 
     @GetMapping("/shared/{token}")
     @Operation(summary = "공유 링크로 플랜 기본 정보 조회")
@@ -74,6 +103,13 @@ public class PlanController {
                 .participants(participants)
                 .editLocks(editLocks)
                 .build());
+    }
+
+    @Getter
+    @Builder
+    public static class ShareLinkResponse {
+        private String shareToken;
+        private String shareUrl;
     }
 
     @Getter

@@ -4,6 +4,7 @@ import com.example.triply.tripPlan.entity.enums.PlanStatus;
 import com.example.triply.tripPlan.entity.enums.TripStyle;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "plan")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Plan {
@@ -47,4 +49,8 @@ public class Plan {
 
     @Column(name = "shared_token", unique = true, length = 100)
     private String sharedToken;
+
+    public void assignSharedToken(String token) {
+        this.sharedToken = token;
+    }
 }

@@ -4,12 +4,14 @@ import com.example.triply.member.entity.Member;
 import com.example.triply.tripPlan.entity.enums.PlaceCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "place")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Place {

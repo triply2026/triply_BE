@@ -10,6 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: no
 
   app:
     build: .
@@ -19,7 +20,7 @@ services:
     env_file: .env
     depends_on:
       - postgres
-    restart: always
+    restart: no
 
 volumes:
   postgres_data:
