@@ -52,4 +52,17 @@ public class Place {
 
     @Column(name = "order_index")
     private Integer orderIndex;
+
+    @Column(columnDefinition = "TEXT")
+    private String memo;
+
+    @Column(name = "reservation_url", length = 500)
+    private String reservationUrl;
+
+    public void update(Integer estimatedDuration, Integer estimatedCost, String memo, String reservationUrl) {
+        this.stayDurationMin = estimatedDuration;
+        this.estimatedCost = estimatedCost;
+        this.memo = memo;
+        this.reservationUrl = reservationUrl;
+    }
 }

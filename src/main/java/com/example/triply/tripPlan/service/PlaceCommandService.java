@@ -47,7 +47,9 @@ public class PlaceCommandService {
                 msg.getLongitude(),
                 msg.getMapPlaceId(),
                 msg.getCategory(),
-                nextOrder
+                nextOrder,
+                null,
+                null
         );
         return placeRepository.save(place);
     }
