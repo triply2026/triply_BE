@@ -53,4 +53,16 @@ public class Plan {
     public void assignSharedToken(String token) {
         this.sharedToken = token;
     }
+
+    public void confirm() {
+        this.status = PlanStatus.CONFIRMED;
+    }
+
+    public void unconfirm() {
+        this.status = PlanStatus.DRAFT;
+    }
+
+    public boolean isConfirmed() {
+        return this.status == PlanStatus.CONFIRMED;
+    }
 }

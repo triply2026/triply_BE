@@ -3,6 +3,8 @@ package com.example.triply.tripPlan.service;
 import com.example.triply.member.repository.PlanMemberRepository;
 import com.example.triply.tripPlan.entity.Days;
 import com.example.triply.tripPlan.entity.Place;
+import com.example.triply.tripPlan.entity.Plan;
+import com.example.triply.tripPlan.entity.enums.PlanStatus;
 import com.example.triply.tripPlan.repository.DaysRepository;
 import com.example.triply.tripPlan.repository.PlaceDetailRepository;
 import com.example.triply.tripPlan.repository.PlaceRepository;
@@ -48,5 +50,29 @@ public class PlanCommandService {
         daysRepository.deleteByPlanId(planId);
         planMemberRepository.deleteByPlanId(planId);
         planRepository.deleteById(planId);
+    }
+
+    @Transactional
+    public PlanStatus confirmPlan(Long planId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 플랜입니다: " + planId));
+        if (plan.isConfirmed()) {
+            throw new IllegalStateException("이미 확정된 플랜입니다.");
+        }
+        plan.confirm();
+        planRepository.save(plan);
+        return plan.getStatus();
+    }
+
+    @Transactional
+    public PlanStatus unconfirmPlan(Long planId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 플랜입니다: " + planId));
+        if (!plan.isConfirmed()) {
+            throw new IllegalStateException("확정되지 않은 플랜입니다.");
+        }
+        plan.unconfirm();
+        planRepository.save(plan);
+        return plan.getStatus();
     }
 }

@@ -1,8 +1,10 @@
 package com.example.triply.websocket.controller;
 
 import com.example.triply.tripPlan.entity.Place;
+import com.example.triply.tripPlan.entity.enums.PlanStatus;
 import com.example.triply.tripPlan.service.PlaceCommandService;
 import com.example.triply.tripPlan.service.PlaceDetailCommandService;
+import com.example.triply.tripPlan.service.PlanCommandService;
 import com.example.triply.websocket.dto.*;
 import com.example.triply.websocket.service.ParticipantSessionService;
 import com.example.triply.websocket.service.PlaceEditLockService;
@@ -27,6 +29,7 @@ public class PlanWebSocketController {
     private final PlaceEditLockService placeEditLockService;
     private final PlaceCommandService placeCommandService;
     private final PlaceDetailCommandService placeDetailCommandService;
+    private final PlanCommandService planCommandService;
 
     @MessageMapping("/plan/{planId}/join")
     public void join(@DestinationVariable Long planId,
@@ -145,6 +148,32 @@ public class PlanWebSocketController {
                 PlanEventMessage.EventType.PLACE_DELETED,
                 planId, msg.getMemberId(), msg.getNickname(),
                 Map.of("placeId", msg.getPlaceId())
+        ));
+    }
+
+    @MessageMapping("/plan/{planId}/confirm")
+    public void confirmPlan(@DestinationVariable Long planId,
+                            @Payload ConfirmPlanMessage msg) {
+        PlanStatus status = planCommandService.confirmPlan(planId);
+        log.info("plan confirmed: planId={}, memberId={}", planId, msg.getMemberId());
+
+        broadcast(planId, PlanEventMessage.of(
+                PlanEventMessage.EventType.PLAN_CONFIRMED,
+                planId, msg.getMemberId(), msg.getNickname(),
+                Map.of("status", status.name())
+        ));
+    }
+
+    @MessageMapping("/plan/{planId}/unconfirm")
+    public void unconfirmPlan(@DestinationVariable Long planId,
+                              @Payload ConfirmPlanMessage msg) {
+        PlanStatus status = planCommandService.unconfirmPlan(planId);
+        log.info("plan unconfirmed: planId={}, memberId={}", planId, msg.getMemberId());
+
+        broadcast(planId, PlanEventMessage.of(
+                PlanEventMessage.EventType.PLAN_UNCONFIRMED,
+                planId, msg.getMemberId(), msg.getNickname(),
+                Map.of("status", status.name())
         ));
     }
 

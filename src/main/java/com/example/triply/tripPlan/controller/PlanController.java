@@ -1,6 +1,7 @@
 package com.example.triply.tripPlan.controller;
 
 import com.example.triply.tripPlan.entity.Plan;
+import com.example.triply.tripPlan.entity.enums.PlanStatus;
 import com.example.triply.tripPlan.service.PlanCommandService;
 import com.example.triply.tripPlan.service.PlanQueryService;
 import com.example.triply.tripPlan.service.PlanShareService;
@@ -78,6 +79,26 @@ public class PlanController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PatchMapping("/{planId}/confirm")
+    @Operation(summary = "일정 확정")
+    public ResponseEntity<ConfirmResponse> confirmPlan(@PathVariable Long planId) {
+        PlanStatus status = planCommandService.confirmPlan(planId);
+        return ResponseEntity.ok(ConfirmResponse.builder()
+                .planId(planId)
+                .status(status)
+                .build());
+    }
+
+    @PatchMapping("/{planId}/unconfirm")
+    @Operation(summary = "일정 확정 해제")
+    public ResponseEntity<ConfirmResponse> unconfirmPlan(@PathVariable Long planId) {
+        PlanStatus status = planCommandService.unconfirmPlan(planId);
+        return ResponseEntity.ok(ConfirmResponse.builder()
+                .planId(planId)
+                .status(status)
+                .build());
+    }
+
     @GetMapping("/{planId}/state")
     @Operation(summary = "플랜 전체 현재 상태 조회 (재연결 동기화용)")
     public ResponseEntity<PlanStateResponse> getPlanState(@PathVariable Long planId) {
@@ -109,6 +130,7 @@ public class PlanController {
                 .planId(state.getPlanId())
                 .title(state.getTitle())
                 .destination(state.getDestination())
+                .status(state.getStatus())
                 .days(state.getDays())
                 .participants(participants)
                 .editLocks(editLocks)
@@ -138,6 +160,7 @@ public class PlanController {
         private Long planId;
         private String title;
         private String destination;
+        private PlanStatus status;
         private List<PlanQueryService.DayStateDto> days;
         private List<ParticipantDto> participants;
         private List<EditLockDto> editLocks;
@@ -156,5 +179,12 @@ public class PlanController {
         private Long placeId;
         private Long memberId;
         private String nickname;
+    }
+
+    @Getter
+    @Builder
+    public static class ConfirmResponse {
+        private Long planId;
+        private PlanStatus status;
     }
 }

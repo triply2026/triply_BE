@@ -24,7 +24,9 @@ public class PlanEventMessage {
         PLACE_ADDED,
         PLACE_DELETED,
         PLACE_UPDATED,
-        PLACE_DETAIL_READY
+        PLACE_DETAIL_READY,
+        PLAN_CONFIRMED,
+        PLAN_UNCONFIRMED
     }
 
     public static PlanEventMessage of(EventType type, Long planId, Long memberId, String nickname, Object payload) {
