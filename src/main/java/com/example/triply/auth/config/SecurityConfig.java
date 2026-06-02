@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/places/*").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/places/*").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/places/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/places/*/votes/summary").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/votes/summary").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/days/*/votes/sorted-place-ids").permitAll()

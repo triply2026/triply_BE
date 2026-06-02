@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PlaceDetailRepository extends JpaRepository<PlaceDetail, Long> {
     Optional<PlaceDetail> findByPlaceId(Long placeId);
+    void deleteByPlaceId(Long placeId);
 }

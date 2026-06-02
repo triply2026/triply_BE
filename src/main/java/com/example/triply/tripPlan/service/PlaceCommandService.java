@@ -5,6 +5,7 @@ import com.example.triply.member.entity.Member;
 import com.example.triply.tripPlan.entity.Days;
 import com.example.triply.tripPlan.entity.Place;
 import com.example.triply.tripPlan.repository.DaysRepository;
+import com.example.triply.tripPlan.repository.PlaceDetailRepository;
 import com.example.triply.tripPlan.repository.PlaceRepository;
 import com.example.triply.websocket.dto.AddPlaceMessage;
 import com.example.triply.websocket.dto.ReorderMessage;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlaceCommandService {
 
     private final PlaceRepository placeRepository;
+    private final PlaceDetailRepository placeDetailRepository;
     private final DaysRepository daysRepository;
     private final AuthRepository authRepository;
 
@@ -56,6 +58,7 @@ public class PlaceCommandService {
 
     @Transactional
     public void deletePlace(Long placeId) {
+        placeDetailRepository.deleteByPlaceId(placeId);
         placeRepository.deleteById(placeId);
     }
 }
