@@ -22,7 +22,9 @@ public class PlanEventMessage {
         PLACE_EDIT_STARTED,
         PLACE_EDIT_ENDED,
         PLACE_ADDED,
-        PLACE_DELETED
+        PLACE_DELETED,
+        PLACE_UPDATED,
+        PLACE_DETAIL_READY
     }
 
     public static PlanEventMessage of(EventType type, Long planId, Long memberId, String nickname, Object payload) {

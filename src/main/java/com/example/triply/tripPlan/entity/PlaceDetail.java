@@ -2,6 +2,7 @@ package com.example.triply.tripPlan.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -12,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "place_detail")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlaceDetail {
@@ -34,4 +36,10 @@ public class PlaceDetail {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<String> image;
+
+    public void updateFromAi(String description, List<String> sourceUrls, List<String> images) {
+        this.description = description;
+        this.sourceUrls = sourceUrls;
+        this.image = images;
+    }
 }

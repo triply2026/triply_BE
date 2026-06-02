@@ -2,6 +2,7 @@ package com.example.triply.websocket.controller;
 
 import com.example.triply.tripPlan.entity.Place;
 import com.example.triply.tripPlan.service.PlaceCommandService;
+import com.example.triply.tripPlan.service.PlaceDetailCommandService;
 import com.example.triply.websocket.dto.*;
 import com.example.triply.websocket.service.ParticipantSessionService;
 import com.example.triply.websocket.service.PlaceEditLockService;
@@ -25,6 +26,7 @@ public class PlanWebSocketController {
     private final ParticipantSessionService participantSessionService;
     private final PlaceEditLockService placeEditLockService;
     private final PlaceCommandService placeCommandService;
+    private final PlaceDetailCommandService placeDetailCommandService;
 
     @MessageMapping("/plan/{planId}/join")
     public void join(@DestinationVariable Long planId,
@@ -95,7 +97,7 @@ public class PlanWebSocketController {
     @MessageMapping("/plan/{planId}/place/add")
     public void addPlace(@DestinationVariable Long planId,
                          @Payload AddPlaceMessage msg) {
-        Place saved = placeCommandService.addPlace(msg);
+        Place saved = placeCommandService.addPlace(msg, planId);
         log.info("place added: planId={}, placeId={}, memberId={}", planId, saved.getId(), msg.getMemberId());
 
         broadcast(planId, PlanEventMessage.of(
@@ -107,7 +109,27 @@ public class PlanWebSocketController {
                         "name", msg.getName(),
                         "address", msg.getAddress() != null ? msg.getAddress() : "",
                         "category", msg.getCategory() != null ? msg.getCategory().name() : "",
-                        "orderIndex", saved.getOrderIndex() != null ? saved.getOrderIndex() : 0
+                        "orderIndex", saved.getOrderIndex() != null ? saved.getOrderIndex() : 0,
+                        "memo", msg.getMemo() != null ? msg.getMemo() : ""
+                )
+        ));
+    }
+
+    @MessageMapping("/plan/{planId}/place/edit/save")
+    public void saveEditing(@DestinationVariable Long planId,
+                            @Payload EditSaveMessage msg) {
+        placeDetailCommandService.updatePlaceFromWebSocket(msg);
+        log.info("place updated: planId={}, placeId={}, memberId={}", planId, msg.getPlaceId(), msg.getMemberId());
+
+        broadcast(planId, PlanEventMessage.of(
+                PlanEventMessage.EventType.PLACE_UPDATED,
+                planId, msg.getMemberId(), msg.getNickname(),
+                Map.of(
+                        "placeId", msg.getPlaceId(),
+                        "estimatedDuration", msg.getEstimatedDuration() != null ? msg.getEstimatedDuration() : 0,
+                        "estimatedCost", msg.getEstimatedCost() != null ? msg.getEstimatedCost() : 0,
+                        "memo", msg.getMemo() != null ? msg.getMemo() : "",
+                        "reservationUrl", msg.getReservationUrl() != null ? msg.getReservationUrl() : ""
                 )
         ));
     }

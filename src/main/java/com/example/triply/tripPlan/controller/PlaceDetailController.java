@@ -6,6 +6,7 @@ import com.example.triply.tripPlan.service.PlaceDetailCommandService;
 import com.example.triply.tripPlan.service.PlaceDetailQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,11 @@ public class PlaceDetailController {
 
     @GetMapping("/{placeId}")
     @Operation(summary = "장소 상세 조회")
-    public ResponseEntity<PlaceDetailResponseDto.Detail> getPlaceDetail(@PathVariable Long placeId) {
-        return ResponseEntity.ok(placeDetailQueryService.getPlaceDetail(placeId));
+    public ResponseEntity<PlaceDetailResponseDto.Detail> getPlaceDetail(
+            @PathVariable Long placeId,
+            HttpSession session) {
+        Long memberId = (Long) session.getAttribute("memberId");
+        return ResponseEntity.ok(placeDetailQueryService.getPlaceDetail(placeId, memberId));
     }
 
     @PutMapping("/{placeId}")

@@ -18,4 +18,5 @@ public class AddPlaceMessage {
     private Double longitude;
     private String mapPlaceId;
     private PlaceCategory category;
+    private String memo;
 }
