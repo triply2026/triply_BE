@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface DaysRepository extends JpaRepository<Days, Long> {
     List<Days> findByPlanIdOrderByDayNumber(Long planId);
+    void deleteByPlanId(Long planId);
 }

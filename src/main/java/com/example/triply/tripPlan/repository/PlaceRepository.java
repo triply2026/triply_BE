@@ -12,6 +12,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     List<Place> findByDayIdOrderByOrderIndex(Long dayId);
 
     List<Place> findByDayIdIn(List<Long> dayIds);
+    void deleteByDayIdIn(List<Long> dayIds);
 
     @Modifying
     @Query("UPDATE Place p SET p.orderIndex = :orderIndex WHERE p.id = :placeId")

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PlanMemberRepository extends JpaRepository<PlanMember, Long> {
     List<PlanMember> findByMemberId(Long memberId);
+    void deleteByPlanId(Long planId);
 }

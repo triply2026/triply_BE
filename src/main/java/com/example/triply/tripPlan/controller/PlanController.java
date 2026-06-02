@@ -1,6 +1,7 @@
 package com.example.triply.tripPlan.controller;
 
 import com.example.triply.tripPlan.entity.Plan;
+import com.example.triply.tripPlan.service.PlanCommandService;
 import com.example.triply.tripPlan.service.PlanQueryService;
 import com.example.triply.tripPlan.service.PlanShareService;
 import com.example.triply.websocket.service.ParticipantSessionService;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PlanController {
 
+    private final PlanCommandService planCommandService;
     private final PlanQueryService planQueryService;
     private final PlanShareService planShareService;
     private final ParticipantSessionService participantSessionService;
@@ -66,6 +69,13 @@ public class PlanController {
                 .startDate(plan.getStartDate().toString())
                 .endDate(plan.getEndDate().toString())
                 .build());
+    }
+
+    @DeleteMapping("/{planId}")
+    @Operation(summary = "플랜 삭제")
+    public ResponseEntity<Void> deletePlan(@PathVariable Long planId) {
+        planCommandService.deletePlan(planId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/{planId}/state")
