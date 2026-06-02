@@ -1,6 +1,7 @@
 package com.example.triply.ai.parser;
 
 import com.example.triply.ai.dto.ItineraryResponseDto;
+import com.example.triply.ai.dto.PlaceDetailAiResponseDto;
 import com.example.triply.ai.exception.GeminiApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,16 @@ import org.springframework.stereotype.Component;
 public class ResponseParser {
 
     private final ObjectMapper objectMapper;
+
+    public PlaceDetailAiResponseDto parsePlaceDetail(String rawJson) {
+        try {
+            String cleaned = stripMarkdownFence(rawJson);
+            return objectMapper.readValue(cleaned, PlaceDetailAiResponseDto.class);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to parse place detail Gemini response. raw={}", rawJson, e);
+            throw new GeminiApiException("장소 상세 Gemini 응답 파싱 실패: " + e.getOriginalMessage(), e);
+        }
+    }
 
     public ItineraryResponseDto parseItinerary(String rawJson) {
         try {

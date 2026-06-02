@@ -65,4 +65,8 @@ public class Place {
         this.memo = memo;
         this.reservationUrl = reservationUrl;
     }
+
+    public void updateReservationUrl(String reservationUrl) {
+        this.reservationUrl = reservationUrl;
+    }
 }
