@@ -1,5 +1,6 @@
 package com.example.triply.tripPlan.service;
 
+import com.example.triply.ai.service.PlaceDetailGenerationService;
 import com.example.triply.auth.repository.AuthRepository;
 import com.example.triply.member.entity.Member;
 import com.example.triply.tripPlan.entity.Days;
@@ -21,6 +22,7 @@ public class PlaceCommandService {
     private final PlaceDetailRepository placeDetailRepository;
     private final DaysRepository daysRepository;
     private final AuthRepository authRepository;
+    private final PlaceDetailGenerationService placeDetailGenerationService;
 
     @Transactional
     public void reorderPlaces(ReorderMessage msg) {
@@ -30,7 +32,7 @@ public class PlaceCommandService {
     }
 
     @Transactional
-    public Place addPlace(AddPlaceMessage msg) {
+    public Place addPlace(AddPlaceMessage msg, Long planId) {
         Days day = daysRepository.findById(msg.getDayId())
                 .orElseThrow(() -> new IllegalArgumentException("Day not found: " + msg.getDayId()));
         Member member = authRepository.findById(msg.getMemberId())
@@ -50,10 +52,12 @@ public class PlaceCommandService {
                 msg.getMapPlaceId(),
                 msg.getCategory(),
                 nextOrder,
-                null,
+                msg.getMemo(),
                 null
         );
-        return placeRepository.save(place);
+        Place saved = placeRepository.save(place);
+        placeDetailGenerationService.generateAsync(saved, planId);
+        return saved;
     }
 
     @Transactional
