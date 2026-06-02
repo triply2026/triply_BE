@@ -6,6 +6,8 @@ import com.example.triply.tripPlan.entity.Place;
 import com.example.triply.tripPlan.entity.PlaceDetail;
 import com.example.triply.tripPlan.repository.PlaceDetailRepository;
 import com.example.triply.tripPlan.repository.PlaceRepository;
+import com.example.triply.vote.dto.VoteResponseDto;
+import com.example.triply.vote.service.VoteQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +19,13 @@ public class PlaceDetailQueryService {
 
     private final PlaceRepository placeRepository;
     private final PlaceDetailRepository placeDetailRepository;
+    private final VoteQueryService voteQueryService;
 
-    public PlaceDetailResponseDto.Detail getPlaceDetail(Long placeId) {
+    public PlaceDetailResponseDto.Detail getPlaceDetail(Long placeId, Long memberId) {
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 장소입니다."));
         PlaceDetail placeDetail = placeDetailRepository.findByPlaceId(placeId).orElse(null);
-        return PlaceDetailConverter.toDetail(place, placeDetail);
+        VoteResponseDto.VoteSummary voteSummary = voteQueryService.getVoteSummary(placeId, memberId);
+        return PlaceDetailConverter.toDetail(place, placeDetail, voteSummary);
     }
 }
