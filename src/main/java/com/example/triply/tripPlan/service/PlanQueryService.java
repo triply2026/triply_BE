@@ -91,6 +91,7 @@ public class PlanQueryService {
                 .planId(plan.getId())
                 .title(plan.getTitle())
                 .destination(plan.getDestination())
+                .status(plan.getStatus())
                 .days(dayStates)
                 .build();
     }
@@ -112,6 +113,7 @@ public class PlanQueryService {
         private Long planId;
         private String title;
         private String destination;
+        private PlanStatus status;
         private List<DayStateDto> days;
     }
 
