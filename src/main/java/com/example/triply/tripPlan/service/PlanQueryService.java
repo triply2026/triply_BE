@@ -76,6 +76,8 @@ public class PlanQueryService {
                             .latitude(p.getLatitude())
                             .longitude(p.getLongitude())
                             .orderIndex(p.getOrderIndex())
+                            .memo(p.getMemo())
+                            .reservationUrl(p.getReservationUrl())
                             .build())
                     .collect(Collectors.toList());
 
@@ -138,5 +140,7 @@ public class PlanQueryService {
         private Double latitude;
         private Double longitude;
         private Integer orderIndex;
+        private String memo;
+        private String reservationUrl;
     }
 }

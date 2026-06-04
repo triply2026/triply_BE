@@ -13,6 +13,8 @@ import com.example.triply.websocket.dto.ReorderMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +58,12 @@ public class PlaceCommandService {
                 null
         );
         Place saved = placeRepository.save(place);
-        placeDetailGenerationService.generateAsync(saved, planId);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                placeDetailGenerationService.generateAsync(saved, planId);
+            }
+        });
         return saved;
     }
 
