@@ -21,6 +21,10 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     void deleteByMemberIdAndPlaceId(Long memberId, Long placeId);
 
+    void deleteByPlaceId(Long placeId);
+
+    void deleteByPlaceIdIn(List<Long> placeIds);
+
     @Query("SELECT v.place.id, v.voteType, COUNT(v) " +
             "FROM Vote v " +
             "WHERE v.place.id IN :placeIds " +

@@ -8,6 +8,7 @@ import com.example.triply.tripPlan.entity.Place;
 import com.example.triply.tripPlan.repository.DaysRepository;
 import com.example.triply.tripPlan.repository.PlaceDetailRepository;
 import com.example.triply.tripPlan.repository.PlaceRepository;
+import com.example.triply.vote.repository.VoteRepository;
 import com.example.triply.websocket.dto.AddPlaceMessage;
 import com.example.triply.websocket.dto.ReorderMessage;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class PlaceCommandService {
     private final DaysRepository daysRepository;
     private final AuthRepository authRepository;
     private final PlaceDetailGenerationService placeDetailGenerationService;
+    private final VoteRepository voteRepository;
 
     @Transactional
     public void reorderPlaces(ReorderMessage msg) {
@@ -69,6 +71,7 @@ public class PlaceCommandService {
 
     @Transactional
     public void deletePlace(Long placeId) {
+        voteRepository.deleteByPlaceId(placeId);
         placeDetailRepository.deleteByPlaceId(placeId);
         placeRepository.deleteById(placeId);
     }

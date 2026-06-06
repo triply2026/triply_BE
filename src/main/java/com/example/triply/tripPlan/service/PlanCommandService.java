@@ -9,6 +9,7 @@ import com.example.triply.tripPlan.repository.DaysRepository;
 import com.example.triply.tripPlan.repository.PlaceDetailRepository;
 import com.example.triply.tripPlan.repository.PlaceRepository;
 import com.example.triply.tripPlan.repository.PlanRepository;
+import com.example.triply.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ public class PlanCommandService {
     private final DaysRepository daysRepository;
     private final PlaceRepository placeRepository;
     private final PlaceDetailRepository placeDetailRepository;
+    private final VoteRepository voteRepository;
 
     @Transactional
     public void deletePlan(Long planId) {
@@ -42,6 +44,7 @@ public class PlanCommandService {
                     .collect(Collectors.toList());
 
             if (!placeIds.isEmpty()) {
+                voteRepository.deleteByPlaceIdIn(placeIds);
                 placeDetailRepository.deleteByPlaceIdIn(placeIds);
             }
             placeRepository.deleteByDayIdIn(dayIds);
