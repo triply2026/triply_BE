@@ -5,6 +5,7 @@ import com.example.triply.tripPlan.entity.enums.PlanStatus;
 import com.example.triply.tripPlan.service.PlanCommandService;
 import com.example.triply.tripPlan.service.PlanQueryService;
 import com.example.triply.tripPlan.service.PlanShareService;
+import com.example.triply.websocket.dto.PlanEventMessage;
 import com.example.triply.websocket.service.ParticipantSessionService;
 import com.example.triply.websocket.service.PlaceEditLockService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +34,7 @@ public class PlanController {
     private final PlanShareService planShareService;
     private final ParticipantSessionService participantSessionService;
     private final PlaceEditLockService placeEditLockService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @GetMapping
     @Operation(summary = "내 플랜 목록 조회")
@@ -74,7 +77,11 @@ public class PlanController {
 
     @DeleteMapping("/{planId}")
     @Operation(summary = "플랜 삭제")
-    public ResponseEntity<Void> deletePlan(@PathVariable Long planId) {
+    public ResponseEntity<Void> deletePlan(@PathVariable Long planId, HttpSession session) {
+        Long memberId = (Long) session.getAttribute("memberId");
+        messagingTemplate.convertAndSend("/topic/plan/" + planId,
+                PlanEventMessage.of(PlanEventMessage.EventType.PLAN_DELETED, planId, memberId, null,
+                        Map.of("planId", planId)));
         planCommandService.deletePlan(planId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

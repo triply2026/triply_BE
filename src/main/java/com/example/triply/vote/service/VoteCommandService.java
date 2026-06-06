@@ -3,16 +3,20 @@ package com.example.triply.vote.service;
 import com.example.triply.auth.repository.AuthRepository;
 import com.example.triply.member.entity.Member;
 import com.example.triply.tripPlan.entity.Place;
+import com.example.triply.tripPlan.repository.PlaceRepository;
 import com.example.triply.vote.converter.VoteConverter;
 import com.example.triply.vote.dto.VoteResponseDto;
 import com.example.triply.vote.entity.Vote;
 import com.example.triply.vote.entity.enums.VoteType;
 import com.example.triply.vote.repository.VoteRepository;
+import com.example.triply.websocket.dto.PlanEventMessage;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -22,6 +26,8 @@ public class VoteCommandService {
     private final VoteRepository voteRepository;
     private final AuthRepository authRepository;
     private final EntityManager entityManager;
+    private final PlaceRepository placeRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /**
      * 투표를 생성하거나 변경한다.
@@ -51,10 +57,12 @@ public class VoteCommandService {
             if (vote.getVoteType() == voteType) {
                 // 같은 유형 재클릭 → 투표 취소
                 voteRepository.delete(vote);
+                broadcastVoteUpdated(placeId, memberId);
                 return null;
             } else {
                 // 다른 유형 클릭 → 변경
                 vote.changeVoteType(voteType);
+                broadcastVoteUpdated(placeId, memberId);
                 return VoteConverter.toVoteInfo(vote);
             }
         }
@@ -62,7 +70,21 @@ public class VoteCommandService {
         // 신규 투표
         Vote newVote = VoteConverter.toEntity(member, place, voteType);
         Vote saved = voteRepository.save(newVote);
-        return VoteConverter.toVoteInfo(saved);
+        VoteResponseDto.VoteInfo voteInfo = VoteConverter.toVoteInfo(saved);
+        broadcastVoteUpdated(placeId, memberId);
+        return voteInfo;
+    }
+
+    private void broadcastVoteUpdated(Long placeId, Long memberId) {
+        placeRepository.findPlanIdByPlaceId(placeId).ifPresent(planId ->
+                messagingTemplate.convertAndSend("/topic/plan/" + planId,
+                        PlanEventMessage.of(
+                                PlanEventMessage.EventType.VOTE_UPDATED,
+                                planId, memberId, null,
+                                Map.of("placeId", placeId)
+                        )
+                )
+        );
     }
 
     /**
@@ -76,5 +98,6 @@ public class VoteCommandService {
         Vote vote = voteRepository.findByMemberIdAndPlaceId(memberId, placeId)
                 .orElseThrow(() -> new IllegalArgumentException("투표 기록이 존재하지 않습니다."));
         voteRepository.delete(vote);
+        broadcastVoteUpdated(placeId, memberId);
     }
 }

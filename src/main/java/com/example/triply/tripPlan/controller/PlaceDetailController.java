@@ -33,7 +33,9 @@ public class PlaceDetailController {
     @Operation(summary = "장소 상세 편집 저장")
     public ResponseEntity<PlaceDetailResponseDto.Detail> updatePlace(
             @PathVariable Long placeId,
-            @RequestBody PlaceDetailRequestDto.Update request) {
-        return ResponseEntity.ok(placeDetailCommandService.updatePlace(placeId, request));
+            @RequestBody PlaceDetailRequestDto.Update request,
+            HttpSession session) {
+        Long memberId = (Long) session.getAttribute("memberId");
+        return ResponseEntity.ok(placeDetailCommandService.updatePlace(placeId, request, memberId));
     }
 }
