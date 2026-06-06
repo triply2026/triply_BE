@@ -61,8 +61,6 @@ public class PlaceDetailGenerationService {
                             Map.of(
                                     "placeId", place.getId(),
                                     "description", aiResponse.getDescription() != null ? aiResponse.getDescription() : "",
-                                    "sourceUrls", aiResponse.getSourceUrls() != null ? aiResponse.getSourceUrls() : java.util.List.of(),
-                                    "images", aiResponse.getImages() != null ? aiResponse.getImages() : java.util.List.of(),
                                     "reservationUrl", aiResponse.getReservationUrl() != null ? aiResponse.getReservationUrl() : ""
                             )
                     )
@@ -71,6 +69,13 @@ public class PlaceDetailGenerationService {
             log.info("Place detail generated: placeId={}, planId={}", place.getId(), planId);
         } catch (Exception e) {
             log.error("Failed to generate place detail: placeId={}, planId={}", place.getId(), planId, e);
+            messagingTemplate.convertAndSend("/topic/plan/" + planId,
+                    PlanEventMessage.of(
+                            PlanEventMessage.EventType.PLACE_DETAIL_FAILED,
+                            planId, null, null,
+                            Map.of("placeId", place.getId())
+                    )
+            );
         }
     }
 }
