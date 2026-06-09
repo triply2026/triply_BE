@@ -1,0 +1,68 @@
+name: Deploy to EC2 (Docker)
+
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean bootJar
+
+      - name: Copy JAR file
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "build/libs/*.jar"
+          target: "/home/ec2-user/triply"
+          strip_components: 2
+
+      - name: Copy Docker configs
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "Dockerfile,docker-compose.yml"
+          target: "/home/ec2-user/triply"
+
+      - name: Deploy with Docker Compose
+        uses: appleboy/ssh-action@v1
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: DB_URL, DB_USERNAME, DB_PASSWORD, GEMINI_API_KEY
+          script: |
+            cd /home/ec2-user/triply
+
+            rm -f app.jar
+            cp triply-0.0.1-SNAPSHOT.jar app.jar
+
+            printf "DB_URL=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\nGEMINI_API_KEY=%s\n" "$DB_URL" "$DB_USERNAME" "$DB_PASSWORD" "$GEMINI_API_KEY" > .env
+            
+            sudo docker-compose down
+            sudo docker-compose up -d --build --force-recreate
+            
+            sudo docker image prune -a -f

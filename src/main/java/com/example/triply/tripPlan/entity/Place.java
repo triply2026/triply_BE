@@ -4,12 +4,14 @@ import com.example.triply.member.entity.Member;
 import com.example.triply.tripPlan.entity.enums.PlaceCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "place")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Place {
@@ -50,4 +52,21 @@ public class Place {
 
     @Column(name = "order_index")
     private Integer orderIndex;
+
+    @Column(columnDefinition = "TEXT")
+    private String memo;
+
+    @Column(name = "reservation_url", length = 500)
+    private String reservationUrl;
+
+    public void update(Integer estimatedDuration, Integer estimatedCost, String memo, String reservationUrl) {
+        this.stayDurationMin = estimatedDuration;
+        this.estimatedCost = estimatedCost;
+        this.memo = memo;
+        this.reservationUrl = reservationUrl;
+    }
+
+    public void updateReservationUrl(String reservationUrl) {
+        this.reservationUrl = reservationUrl;
+    }
 }

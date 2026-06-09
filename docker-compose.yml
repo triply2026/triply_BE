@@ -10,6 +10,17 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: no
+
+  app:
+    build: .
+    container_name: triply-app
+    ports:
+      - "8080:8080"
+    env_file: .env
+    depends_on:
+      - postgres
+    restart: no
 
 volumes:
   postgres_data:
